@@ -1,7 +1,9 @@
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import time
+from selenium.webdriver.chrome.options import Options
+options = Options()
+options.add_argument('--headless')
 
 ###########################################################################
 # User Inputs
@@ -36,7 +38,7 @@ def extract_data(driver):
         dates.append(driver.find_element_by_xpath(f'//*[@id="{i}"]/div/div/div[2]/div/div[1]/span/span/span[1]').text)
         titles.append(driver.find_element_by_xpath(f'//*[@id="{i}"]/div/div/div[2]/div/div[1]/h2/a').text)
         pros.append(driver.find_element_by_xpath(f'//*[@id="{i}"]/div/div/div[2]/div/div[2]/div[1]/p[2]/span').text)
-        cons.append(driver.find_element_by_xpath(f'//*[@id="{i}"]/div/div/div[2]/div/div[2]/div[2]/p[2]/span'))
+        cons.append(driver.find_element_by_xpath(f'//*[@id="{i}"]/div/div/div[2]/div/div[2]/div[2]/p[2]/span').text)
     
     df = pd.DataFrame({
         'Rating':ratings,
@@ -56,23 +58,34 @@ def extract_reviews(b_url, p_url, n_pages):
     p_url: paginated url
     n_pages: int, number of pages to scrape reviews from
     '''
-    driver = webdriver.Chrome(chrome_driver)
     reviews = pd.DataFrame()
     for i in range(1, n_pages + 1):
+        driver = webdriver.Chrome(chrome_driver, chrome_options = options)
         if i == 1:
             driver.get(b_url)
-            time.sleep(2)
+            driver.implicitly_wait(2)
             reviews = extract_data(driver)
-            # driver.close()
+            print('Page 1 scraped')
         else:
+            # We open a new window to open the paginated urls
+            # After scraping the page 2 data, window is closed
+            driver.execute_script("window.open('');")
+            driver.switch_to.window(driver.window_handles[1])
+            
             p_url = p_url.replace('_IP2', f'_IP{i}')
             driver.get(p_url)
-            time.sleep(2)
-            pd.concat([reviews, extract_data(driver)], axis = 0)
-            # driver.close()
-        time.sleep(2)
+            driver.implicitly_wait(2)
+            reviews = pd.concat([reviews, extract_data(driver)], axis = 0)
+            
+            # Close the paginated new window
+            driver.close()
+            driver.switch_to.window(driver.window_handles[0])
+            print(f'Page {i} scraped')
+        driver.implicitly_wait(5)
+    # Final quit method to close the webdriver and exit completely after ending the loop
+    driver.quit()
     return reviews
 
 # Main Loop
-reviews = extract_reviews(base_url, paginated_url, 2)
+reviews = extract_reviews(base_url, paginated_url, 5)
 reviews.to_csv(save_path, index = None)
