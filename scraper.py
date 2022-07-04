@@ -15,6 +15,7 @@ chrome_driver = 'chromedriver.exe'
 base_url = 'https://www.glassdoor.co.in/Reviews/Fractal-India-Reviews-EI_IE270403.0,7_IL.8,13_IN115.htm?sort.sortType=RD&sort.ascending=false&filter.iso3Language=eng'
 paginated_url = 'https://www.glassdoor.co.in/Reviews/Fractal-India-Reviews-EI_IE270403.0,7_IL.8,13_IN115_IP2.htm?sort.sortType=RD&sort.ascending=false&filter.iso3Language=eng'
 
+number_of_pages = 30
 save_path = 'reviews.csv'
 ###########################################################################
 
@@ -72,7 +73,8 @@ def extract_reviews(b_url, p_url, n_pages):
             driver.execute_script("window.open('');")
             driver.switch_to.window(driver.window_handles[1])
             
-            p_url = p_url.replace('_IP2', f'_IP{i}')
+            if i > 2:
+                p_url = p_url.replace(f'_IP{i-1}', f'_IP{i}')
             driver.get(p_url)
             driver.implicitly_wait(2)
             reviews = pd.concat([reviews, extract_data(driver)], axis = 0)
@@ -81,11 +83,12 @@ def extract_reviews(b_url, p_url, n_pages):
             driver.close()
             driver.switch_to.window(driver.window_handles[0])
             print(f'Page {i} scraped')
-        driver.implicitly_wait(5)
+        driver.implicitly_wait(2)
     # Final quit method to close the webdriver and exit completely after ending the loop
     driver.quit()
+    print('\nAll pages scraped!!!')
     return reviews
 
 # Main Loop
-reviews = extract_reviews(base_url, paginated_url, 5)
+reviews = extract_reviews(base_url, paginated_url, number_of_pages)
 reviews.to_csv(save_path, index = None)
