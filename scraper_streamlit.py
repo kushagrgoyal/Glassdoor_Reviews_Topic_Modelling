@@ -8,16 +8,16 @@ options.add_argument('--headless')
 
 ###########################################################################
 # User Inputs
-chrome_driver = 'chromedriver.exe'
+# chrome_driver = 'chromedriver.exe'
 
 # Depending upon the company, the base url and paginated url will be different
 # Update them accordingly
 # Here, it is for Fractal Analytics, already sorted by 'Most Recent', page format is _P2, _P3 etc.
-base_url = 'https://www.glassdoor.co.in/Reviews/Deloitte-Senior-Consultant-Karnataka-Reviews-EI_IE2763.0,8_KO9,26_IL.27,36_IS4947.htm?sort.sortType=RD&sort.ascending=false&filter.jobTitleFTS=Senior+Consultant&filter.iso3Language=eng&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME'
-paginated_url = 'https://www.glassdoor.co.in/Reviews/Deloitte-Senior-Consultant-Reviews-EI_IE2763.0,8_KO9,26_IS4947_IP2.htm?sort.sortType=RD&sort.ascending=false&filter.jobTitleFTS=Senior+Consultant&filter.iso3Language=eng&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME'
+# base_url = 'https://www.glassdoor.co.in/Reviews/Deloitte-Senior-Consultant-Karnataka-Reviews-EI_IE2763.0,8_KO9,26_IL.27,36_IS4947.htm?sort.sortType=RD&sort.ascending=false&filter.jobTitleFTS=Senior+Consultant&filter.iso3Language=eng&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME'
+# paginated_url = 'https://www.glassdoor.co.in/Reviews/Deloitte-Senior-Consultant-Reviews-EI_IE2763.0,8_KO9,26_IS4947_IP2.htm?sort.sortType=RD&sort.ascending=false&filter.jobTitleFTS=Senior+Consultant&filter.iso3Language=eng&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME'
 
-number_of_pages = 2
-save_path = 'Deloitte_reviews_new.csv'
+# number_of_pages = 2
+# save_path = 'Deloitte_reviews_new.csv'
 ###########################################################################
 
 def extract_data(driver):
@@ -99,5 +99,5 @@ def extract_reviews(b_url, p_url, n_pages):
     return reviews
 
 # Main Loop
-reviews = extract_reviews(base_url, paginated_url, number_of_pages)
-reviews.to_csv(save_path, index = None)
+# reviews = extract_reviews(base_url, paginated_url, number_of_pages)
+# reviews.to_csv(save_path, index = None)
