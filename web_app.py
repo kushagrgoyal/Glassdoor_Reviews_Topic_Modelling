@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import streamlit as st
 from scraper_streamlit import glassdoor_scraper
-from topic_modelling import 
+from topic_modelling import topic_model_maker
 
 # Building the inputs required for data scraping from Glassdoor
 st.title('Glassdoor Scraper + Topic Modelling')
