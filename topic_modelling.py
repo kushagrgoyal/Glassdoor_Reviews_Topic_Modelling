@@ -1,3 +1,5 @@
+import nltk
+from nltk.corpus import stopwords
 from bertopic import BERTopic
 from bertopic.backend import WordDocEmbedder
 from flair.embeddings import TransformerDocumentEmbeddings
@@ -5,27 +7,40 @@ import numpy as np
 import pandas as pd
 import re
 from sentence_transformers import SentenceTransformer, util
+from string import punctuation
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.decomposition import NMF
+from sklearn.pipeline import make_pipeline
 
 class topic_model_maker():
-    def __init__(self, rev_path):
+    def __init__(self, rev):
         '''
-        rev_path: Path of .csv file of self.rev
+        rev_path: Pandas DataFrame of reviews
         '''
-        self.rev_path = rev_path
+        self.rev = rev
     
     def preprocess_reviews(self):
         '''
         This function performs basic text processing of Pros and Cons in the reviews
         '''
-        self.rev = pd.read_csv(self.rev_path)
         self.rev[['Employee_status', 'Duration']] = self.rev['Employee_status'].str.split(', ', expand = True)
-        self.rev[['Review_date', 'Position']] = self.rev['Review_date'].str.split(' - ', expand = True)
+        self.rev[['Review_date', 'Position']] = self.rev['Review_date'].str.split(' - ', n = 1, expand = True)
 
         self.rev['Review_date'] = pd.to_datetime(self.rev['Review_date'])
         self.rev['Cons'] = self.rev['Cons'].str.lower()
         self.rev['Pros'] = self.rev['Pros'].str.lower()
         self.rev['Cons'] = self.rev['Cons'].apply(lambda x: re.sub("\.{1,5}|-{1,5}|>|<|\d\.|,", '', x)).apply(lambda x: re.sub("/", ' ', x)).apply(lambda x: re.sub(" {2,5}", ' ', x))
         self.rev['Pros'] = self.rev['Pros'].apply(lambda x: re.sub("\.{1,5}|-{1,5}|>|<|\d\.|,", '', x)).apply(lambda x: re.sub("/", ' ', x)).apply(lambda x: re.sub(" {2,5}", ' ', x))
+        
+        sent_list = ['nothing not bad at all really good',
+               'everything is good as of now',
+               'no cons observed till date',
+               "nothing as of now it's the best company",
+               'nothing that i can think of',
+               "i couldn't find any significant con",
+               'none really i love it here',
+               ]
+        self.rev = self.remove_reviews_with_no_cons(sent_list)
         return self.rev
     
     def remove_reviews_with_no_cons(self, sentences_list, threshold = 0.25):
@@ -51,6 +66,9 @@ class topic_model_maker():
         '''
         This function creates the embeddings for the Cons and performs Topic modelling with them
         '''
+        # We do the preprocessing of all the reviews here directly using the preprocess_reviews function
+        self.rev = self.preprocess_reviews()
+
         # Word embedding model
         bert = TransformerDocumentEmbeddings('bert-base-uncased')
 
@@ -64,8 +82,24 @@ class topic_model_maker():
 
         return self.topic_model, self.con_topics, self.con_probs
     
-    def create_visualisations(self):
+    def find_topics_sklearn(self, nmf_comp = 5, n_top_words = 5):
         '''
-        This function creates the visualizations for understanding the different topics in the Cons of the reviews
+        This function performs the topic extraction and provides the topics and their highest occurring words
+        nmf_comp: Number of topics to extract
+        n_top_words: Number of words in each topic
         '''
-        return self.topic_model.visualize_documents(self.rev['Cons'])
+        stoplist = stopwords.words('english')
+
+        tfidf_vectorizer = TfidfVectorizer(stop_words = stoplist, ngram_range = (3, 7))
+        nmf = NMF(n_components = nmf_comp)
+        self.pipe = make_pipeline(tfidf_vectorizer, nmf)
+        self.pipe.fit(self.rev['Cons'])
+        
+        feature_names = tfidf_vectorizer.get_feature_names()
+
+        self.output = {}
+        for topic_idx, topic in enumerate(nmf.components_):
+            self.output[f'Topic_{topic_idx}'] = ", ".join([feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]])
+        
+        self.output = pd.DataFrame(self.output).T        
+        return self.output
