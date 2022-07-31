@@ -2,9 +2,12 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+
+from selenium.webdriver.chrome.service import Service as ChromiumService
 from selenium.webdriver.chrome.service import Service as ChromeService
-import tempfile
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.utils import ChromeType
+
 options = Options()
 options.add_argument('--headless')
 
@@ -70,7 +73,8 @@ class glassdoor_scraper():
         self.r = pd.DataFrame()
         for i in range(1, self.n + 1):
             # self.dr = webdriver.Chrome(self.dr_path, chrome_options = options)
-            self.dr = webdriver.Chrome(service = ChromeService(ChromeDriverManager().install()), chrome_options = options)
+            # self.dr = webdriver.Chrome(service = ChromeService(ChromeDriverManager().install()), chrome_options = options)
+            self.dr = webdriver.Chrome(service = ChromiumService(ChromeDriverManager(chrome_type = ChromeType.CHROMIUM).install()))
             if i == 1:
                 self.dr.get(self.b)
                 self.dr.implicitly_wait(2)
