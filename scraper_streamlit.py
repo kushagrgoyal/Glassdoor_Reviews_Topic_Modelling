@@ -2,6 +2,9 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
+import tempfile
+from webdriver_manager.chrome import ChromeDriverManager
 options = Options()
 options.add_argument('--headless')
 
@@ -9,7 +12,7 @@ class glassdoor_scraper():
     '''
     This is a Glassdoor scraper class that can scrape reviews for any company from Glassdoor
     '''
-    def __init__(self, dr_path, b, n):
+    def __init__(self, b, n):
         '''
         dr_path: Chrome driver path
         b: Base page url
@@ -17,7 +20,7 @@ class glassdoor_scraper():
         s_path: Save location of path
         '''
         # self.dr = webdriver.Chrome(self.dr_path, chrome_options = options)
-        self.dr_path = dr_path
+        # self.dr_path = dr_path
         self.b = b
         self.n = n
     
@@ -66,7 +69,8 @@ class glassdoor_scraper():
         '''
         self.r = pd.DataFrame()
         for i in range(1, self.n + 1):
-            self.dr = webdriver.Chrome(self.dr_path, chrome_options = options)
+            # self.dr = webdriver.Chrome(self.dr_path, chrome_options = options)
+            self.dr = webdriver.Chrome(service = ChromeService(ChromeDriverManager().install()), chrome_options = options)
             if i == 1:
                 self.dr.get(self.b)
                 self.dr.implicitly_wait(2)

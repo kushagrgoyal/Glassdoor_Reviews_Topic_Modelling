@@ -1,4 +1,6 @@
 import nltk
+nltk.download('stopwords')
+
 from nltk.corpus import stopwords
 from bertopic import BERTopic
 from bertopic.backend import WordDocEmbedder

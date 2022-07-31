@@ -7,3 +7,4 @@ scikit_learn==1.1.1
 selenium==4.3.0
 sentence_transformers==2.2.2
 streamlit==1.11.0
+webdriver_manager==3.8.2
