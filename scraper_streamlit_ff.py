@@ -14,7 +14,6 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 options = Options()
 options.add_argument('--headless')
-service = Service(GeckoDriverManager().install())
 
 class glassdoor_scraper():
     '''
@@ -80,6 +79,7 @@ class glassdoor_scraper():
             # self.dr = webdriver.Chrome(self.dr_path, chrome_options = options)
             # self.dr = webdriver.Chrome(service = ChromeService(ChromeDriverManager().install()), chrome_options = options)
             # self.dr = webdriver.Chrome(service = ChromiumService(ChromeDriverManager(chrome_type = ChromeType.CHROMIUM).install()))
+            service = Service(GeckoDriverManager().install())
             self.dr =  webdriver.Firefox(options = options, service = service)
             if i == 1:
                 self.dr.get(self.b)
