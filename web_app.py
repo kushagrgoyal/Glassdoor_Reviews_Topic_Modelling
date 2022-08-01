@@ -1,7 +1,7 @@
-# import os
+# import os, sys
 import pandas as pd
 import streamlit as st
-from scraper_streamlit import glassdoor_scraper
+from scraper_streamlit_ff import glassdoor_scraper
 from topic_modelling import topic_model_maker
 
 # Setting the page layout to wide mode as that is better for the visualosations
