@@ -23,8 +23,10 @@ if choice == 'Scrape Data':
 
     if scrape_button:
         scraper = glassdoor_scraper(base_url, int(n_pages))
-        reviews = scraper.extract_reviews()
-
+        
+        with st.spinner('Scraping Data...'):
+            reviews = scraper.extract_reviews()
+        # st.success('Done!')
         st.write(reviews)
 
         topic = topic_model_maker(reviews)
