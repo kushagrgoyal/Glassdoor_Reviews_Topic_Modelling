@@ -42,10 +42,10 @@ class topic_model_maker():
         This function performs basic text processing of Pros and Cons in the reviews
         edit: New function preprocess_data works better in experiments so that will be used
         '''
-        self.rev[['Employee_status', 'Duration']] = self.rev['Employee_status'].str.split(', ', expand = True)
-        self.rev[['Review_date', 'Position']] = self.rev['Review_date'].str.split(' - ', n = 1, expand = True)
+        # self.rev[['Employee_status', 'Duration']] = self.rev['Employee_status'].str.split(', ', expand = True)
+        # self.rev[['Review_date', 'Position']] = self.rev['Review_date'].str.split(' - ', n = 1, expand = True)
 
-        self.rev['Review_date'] = pd.to_datetime(self.rev['Review_date'])
+        # self.rev['Review_date'] = pd.to_datetime(self.rev['Review_date'])
         self.rev['Cons'] = self.rev['Cons'].str.lower()
         self.rev['Pros'] = self.rev['Pros'].str.lower()
         # self.rev['Cons'] = self.rev['Cons'].apply(lambda x: re.sub("\.{1,5}|-{1,5}|>|<|\d\.|,", '', x)).apply(lambda x: re.sub("/", ' ', x)).apply(lambda x: re.sub(" {2,5}", ' ', x))
